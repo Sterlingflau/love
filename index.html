@@ -41,11 +41,11 @@
 <script>
   var settings = {
     particles: {
-      length: 500, // maximum amount of particles
-      duration: 2, // particle duration in sec
-      velocity: 100, // particle velocity in pixels/sec
-      effect: -0.75, // play with this for a nice effect
-      size: 30, // particle size in pixels
+      length: 200,     // 减少数量以提高性能
+      duration: 2.5,   // 增加持续时间
+      velocity: 80,    // 降低速度使运动更自然
+      effect: -0.2,    // 调整效果
+      size: 24,        // 调整草莓大小
     },
   };
   (
@@ -192,10 +192,9 @@
 // get point on heart with -PI <= t <= PI
     function pointOnHeart(t) {
       return new Point(
-              160 * Math.pow(Math.sin(t), 3),
-              130 * Math.cos(t) - 50 * Math.cos(2 * t) - 20 * Math.cos(3 * t) - 10 * Math.cos(4 * t) + 25
+        (Math.random() * 2 - 1) * 200,  // x范围：-200到200
+        (Math.random() * 2 - 1) * 200   // y范围：-200到200
       );
-
     }
 
 // creating the particle image using a dummy canvas
@@ -205,29 +204,47 @@
               context = canvas.getContext('2d');
       canvas.width = settings.particles.size;
       canvas.height = settings.particles.size;
-// helper function to create the path
-      function to(t) {
-        var point = pointOnHeart(t);
-        point.x = settings.particles.size / 2 + point.x * settings.particles.size / 350;
-        point.y = settings.particles.size / 2 - point.y * settings.particles.size / 350;
-        return point;
+      
+      // 绘制草莓
+      function drawStrawberry(ctx, size) {
+        // 缩放所有绘制操作以适应size
+        const scale = size / 30;  // 基准大小为30
+        ctx.save();
+        ctx.scale(scale, scale);
+        
+        // 草莓主体
+        ctx.beginPath();
+        ctx.fillStyle = '#ff3366';
+        ctx.arc(15, 15, 12, 0, Math.PI * 2);
+        ctx.fill();
+
+        // 草莓叶子
+        ctx.beginPath();
+        ctx.fillStyle = '#33cc33';
+        ctx.moveTo(15, 3);
+        ctx.lineTo(10, 8);
+        ctx.lineTo(20, 8);
+        ctx.closePath();
+        ctx.fill();
+
+        // 草莓籽点
+        ctx.fillStyle = '#ffff00';
+        for(let i = 0; i < 8; i++) {
+          let angle = (Math.PI * 2 * i) / 8;
+          let x = 15 + Math.cos(angle) * 6;
+          let y = 15 + Math.sin(angle) * 6;
+          ctx.beginPath();
+          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
+          ctx.fill();
+        }
+        
+        ctx.restore();
       }
-// create the path
-      context.beginPath();
-      var t = -Math.PI;
-      var point = to(t);
-      context.moveTo(point.x, point.y);
-      while (t < Math.PI) {
-        t += 0.01; // baby steps!
-        point = to(t);
-        context.lineTo(point.x, point.y);
-      }
-      context.closePath();
-// create the fill
-      context.fillStyle = '#ff30c5';
-      // context.fillStyle = '#ea80b0';
-      context.fill();
-// create the image
+
+      // 绘制草莓
+      drawStrawberry(context, settings.particles.size);
+
+      // 创建图片
       var image = new Image();
       image.src = canvas.toDataURL();
       return image;
@@ -245,9 +262,17 @@
 // create new particles
       var amount = particleRate * deltaTime;
       for (var i = 0; i < amount; i++) {
-        var pos = pointOnHeart(Math.PI - 2 * Math.PI * Math.random());
-        var dir = pos.clone().length(settings.particles.velocity);
-        particles.add(canvas.width / 2 + pos.x, canvas.height / 2 - pos.y, dir.x, -dir.y);
+        var pos = pointOnHeart(Math.random() * Math.PI * 2);
+        var dir = new Point(
+          (Math.random() * 2 - 1) * settings.particles.velocity,
+          (Math.random() * 2 - 1) * settings.particles.velocity
+        );
+        particles.add(
+          canvas.width / 2 + pos.x, 
+          canvas.height / 2 + pos.y, 
+          dir.x, 
+          dir.y
+        );
       }
 // update and draw particles
       particles.update(deltaTime);
@@ -267,7 +292,7 @@
   })(document.getElementById('pinkboard'));
 </script>
 <div class="namebox">
-  <h1>Sterling&#10084;&#65039;Vivian&Eric同学</h1>
+  <h1>草莓世界</h1>
 </div>
 </body>
 </html>
