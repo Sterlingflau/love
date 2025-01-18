@@ -205,46 +205,36 @@
       canvas.width = settings.particles.size;
       canvas.height = settings.particles.size;
       
-      // 绘制草莓
-      function drawStrawberry(ctx, size) {
-        // 缩放所有绘制操作以适应size
-        const scale = size / 30;  // 基准大小为30
-        ctx.save();
-        ctx.scale(scale, scale);
-        
-        // 草莓主体
-        ctx.beginPath();
-        ctx.fillStyle = '#ff3366';
-        ctx.arc(15, 15, 12, 0, Math.PI * 2);
-        ctx.fill();
-
-        // 草莓叶子
-        ctx.beginPath();
-        ctx.fillStyle = '#33cc33';
-        ctx.moveTo(15, 3);
-        ctx.lineTo(10, 8);
-        ctx.lineTo(20, 8);
-        ctx.closePath();
-        ctx.fill();
-
-        // 草莓籽点
-        ctx.fillStyle = '#ffff00';
-        for(let i = 0; i < 8; i++) {
-          let angle = (Math.PI * 2 * i) / 8;
-          let x = 15 + Math.cos(angle) * 6;
-          let y = 15 + Math.sin(angle) * 6;
-          ctx.beginPath();
-          ctx.arc(x, y, 1.5, 0, Math.PI * 2);
-          ctx.fill();
-        }
-        
-        ctx.restore();
+      // 简化草莓绘制，确保可见
+      context.fillStyle = '#ff0000';  // 鲜红色
+      context.beginPath();
+      context.arc(settings.particles.size/2, settings.particles.size/2, 
+                  settings.particles.size/2, 0, Math.PI * 2);
+      context.fill();
+      
+      // 添加叶子
+      context.fillStyle = '#00ff00';  // 鲜绿色
+      context.beginPath();
+      context.moveTo(settings.particles.size/2, 0);
+      context.lineTo(settings.particles.size/3, settings.particles.size/3);
+      context.lineTo(settings.particles.size*2/3, settings.particles.size/3);
+      context.fill();
+      
+      // 添加小点
+      context.fillStyle = '#ffff00';  // 黄色
+      for(let i = 0; i < 5; i++) {
+          context.beginPath();
+          context.arc(
+              settings.particles.size/2 + Math.cos(i*Math.PI*0.4) * settings.particles.size/4,
+              settings.particles.size/2 + Math.sin(i*Math.PI*0.4) * settings.particles.size/4,
+              settings.particles.size/10,
+              0,
+              Math.PI * 2
+          );
+          context.fill();
       }
 
-      // 绘制草莓
-      drawStrawberry(context, settings.particles.size);
-
-      // 创建图片
+      // 创建图片并返回
       var image = new Image();
       image.src = canvas.toDataURL();
       return image;
